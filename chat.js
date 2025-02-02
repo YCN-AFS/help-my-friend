@@ -70,7 +70,7 @@ MỤC TIÊU:
         
         // Chat bubble
         bubbleSize: 'min(65px, 15vw)',
-        bubbleImage: 'https://www.dropbox.com/scl/fi/i6tpooydfgcbdkg9c3z72/images.jpg?rlkey=4hhx538lxbdca8chpigxipp55&st=6r72goym&dl=1',
+        bubbleImage: 'images.jpg',
         
         // Messages
         userMessageColor: '#667eea',  // Cập nhật màu tin nhắn người dùng
@@ -81,7 +81,7 @@ MỤC TIÊU:
         // Avatars
         avatarSize: '35px',
         userAvatar: 'https://i.imgur.com/2kPZvZX.png',
-        botAvatar: 'https://www.dropbox.com/scl/fi/i6tpooydfgcbdkg9c3z72/images.jpg?rlkey=4hhx538lxbdca8chpigxipp55&st=6r72goym&dl=1',
+        botAvatar: 'images.jpg',
         
         // Font
         fontFamily: "'Roboto', sans-serif",
