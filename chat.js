@@ -155,37 +155,65 @@ MỤC TIÊU:
                 left: 0 !important;
                 right: 0 !important;
                 bottom: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-                max-height: none !important;
-                border-radius: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                max-height: 100vh !important;
                 margin: 0 !important;
+                padding: 0 !important;
+                border-radius: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+
+            .chat-header {
+                flex-shrink: 0;
+                padding: env(safe-area-inset-top) 15px 15px 15px !important;
             }
 
             #chat-messages {
-                height: calc(100% - 130px) !important;
+                flex: 1;
+                height: auto !important;
                 max-height: none !important;
+                padding-bottom: 20px !important;
             }
 
-            .chat-bubble {
-                max-width: 85%;
-                font-size: 14px;
+            .chat-input-container {
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                background: white !important;
+                padding: 10px 15px calc(10px + env(safe-area-inset-bottom)) 15px !important;
+                border-top: 1px solid #eee !important;
+                z-index: 1001 !important;
             }
 
             #chat-text {
-                font-size: 16px !important;
+                max-height: 100px !important;
+                min-height: 40px !important;
+                padding: 10px 15px !important;
+                font-size: 16px !important; /* Prevent zoom on iOS */
             }
 
             #send-btn {
-                padding: 10px 15px !important;
-                min-width: 60px;
+                height: 44px !important; /* Better touch target */
+                margin-bottom: env(safe-area-inset-bottom) !important;
             }
 
-            #chat-bubble {
-                width: 50px !important;
-                height: 50px !important;
-                bottom: 20px !important;
-                right: 20px !important;
+            /* Fix viewport when keyboard is visible */
+            @supports (-webkit-touch-callout: none) {
+                .chat-input-container {
+                    padding-bottom: 10px !important;
+                }
+                
+                body.keyboard-visible #chat-messages {
+                    padding-bottom: 270px !important; /* Adjust based on keyboard height */
+                }
+            }
+
+            /* Hide chat bubble when window is open */
+            #chat-window[style*="flex"] ~ #chat-bubble {
+                display: none !important;
             }
         }
 
@@ -523,7 +551,7 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
         }
     }
 
-    // Hàm gọi API Gemini
+    // Cập nhật hàm fetchGeminiResponse
     async function fetchGeminiResponse(userMessage) {
         try {
             // Thêm tin nhắn mới vào lịch sử
@@ -536,10 +564,14 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
             
             const fullPrompt = `${CONFIG.SYSTEM_PROMPT}\n\n${messages}\nAssistant:`;
 
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`, {
+            // Tạo request với các options phù hợp cho mobile
+            const requestOptions = {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Cache-Control": "no-cache",
+                    "Pragma": "no-cache"
                 },
                 body: JSON.stringify({
                     contents: [{
@@ -549,19 +581,71 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
                     }],
                     generationConfig: CONFIG.AI_CONFIG
                 }),
+                mode: 'cors',
+                cache: 'no-cache',
+                credentials: 'omit'
+            };
+
+            // Thêm timeout
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Request timeout')), 30000);
             });
 
-            const data = await response.json();
-            if (data.candidates && data.candidates[0].content.parts[0]) {
-                let botResponse = data.candidates[0].content.parts[0].text;
-                chatHistory.push({ role: "assistant", content: botResponse });
-                return botResponse;
+            // Race giữa fetch và timeout
+            const response = await Promise.race([
+                fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`, requestOptions),
+                timeoutPromise
+            ]);
+
+            // Kiểm tra response
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-            return "Xin lỗi, tôi không thể trả lời lúc này.";
+
+            // Parse response dạng text trước
+            const responseText = await response.text();
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                console.error('Failed to parse response:', responseText);
+                throw new Error('Invalid JSON response');
+            }
+
+            if (!data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+                throw new Error('Invalid response format');
+            }
+
+            const botResponse = data.candidates[0].content.parts[0].text;
+            chatHistory.push({ role: "assistant", content: botResponse });
+            return botResponse;
+
         } catch (error) {
-            console.error("Error fetching Gemini response:", error);
-            return "Đã xảy ra lỗi khi xử lý yêu cầu của bạn.";
+            console.error("Error details:", error);
+
+            // Xử lý các lỗi cụ thể
+            if (error.message.includes('timeout')) {
+                return "Rất tiếc, kết nối đang chậm. Cậu thử lại nhé!";
+            }
+            if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
+                return "Kiểm tra lại kết nối mạng và thử lại nhé!";
+            }
+            if (error.message.includes('Invalid JSON')) {
+                return "Có lỗi khi xử lý phản hồi. Cậu thử lại sau nhé!";
+            }
+            return "Xin lỗi cậu, tớ đang gặp chút vấn đề. Cậu thử lại sau nhé!";
         }
+    }
+
+    // Thêm polyfill cho Promise.race nếu cần
+    if (!Promise.race) {
+        Promise.race = function(promises) {
+            return new Promise((resolve, reject) => {
+                promises.forEach(promise => {
+                    Promise.resolve(promise).then(resolve, reject);
+                });
+            });
+        };
     }
 
     // Thêm hàm để load lịch sử chat khi mở chatbot
@@ -619,30 +703,35 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
     const sendBtn = document.getElementById('send-btn');
     const chatMessages = document.getElementById('chat-messages');
 
-    // Gửi tin nhắn khi click nút Send
+    // Cập nhật event listener cho nút gửi
     sendBtn.addEventListener('click', async () => {
         const message = chatText.value.trim();
         if (message) {
-            // Thêm class sending cho input container
-            document.querySelector('.chat-input-container').classList.add('sending');
-            
-            // Disable input và nút gửi
-            chatText.disabled = true;
-            sendBtn.disabled = true;
+            try {
+                // Thêm class sending cho input container
+                document.querySelector('.chat-input-container').classList.add('sending');
+                
+                // Disable input và nút gửi
+                chatText.disabled = true;
+                sendBtn.disabled = true;
 
-            appendMessage('You', message);
-            chatText.value = '';
-            
-            // Gọi API và hiển thị response
-            const response = await fetchGeminiResponse(message);
-            
-            // Remove sending class và enable input
-            document.querySelector('.chat-input-container').classList.remove('sending');
-            chatText.disabled = false;
-            sendBtn.disabled = false;
-            chatText.focus();
+                appendMessage('You', message);
+                chatText.value = '';
+                
+                // Gọi API và hiển thị response
+                const response = await fetchGeminiResponse(message);
+                appendMessage('Bot', response);
 
-            appendMessage('Bot', response);
+            } catch (error) {
+                console.error('Error in send button handler:', error);
+                appendMessage('Bot', "Xin lỗi, có lỗi xảy ra. Hãy thử lại!");
+            } finally {
+                // Luôn đảm bảo reset UI state
+                document.querySelector('.chat-input-container').classList.remove('sending');
+                chatText.disabled = false;
+                sendBtn.disabled = false;
+                chatText.focus();
+            }
         }
     });
 
@@ -745,5 +834,42 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
             background: #f5f5f5;
         }
     `;
+
+    // Thêm xử lý keyboard cho iOS
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        const visualViewport = window.visualViewport;
+        
+        if (visualViewport) {
+            visualViewport.addEventListener('resize', () => {
+                if (visualViewport.height < window.innerHeight) {
+                    // Keyboard is visible
+                    document.body.classList.add('keyboard-visible');
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                } else {
+                    // Keyboard is hidden
+                    document.body.classList.remove('keyboard-visible');
+                }
+            });
+        }
+
+        // Scroll to bottom when focusing input
+        chatText.addEventListener('focus', () => {
+            setTimeout(() => {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                window.scrollTo(0, 0);
+            }, 100);
+        });
+    }
+
+    // Thêm viewport meta tag với viewport-fit=cover
+    const viewport = document.querySelector('meta[name="viewport"]');
+    if (viewport) {
+        viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+    } else {
+        const newViewport = document.createElement('meta');
+        newViewport.name = 'viewport';
+        newViewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+        document.head.appendChild(newViewport);
+    }
 })();
   
