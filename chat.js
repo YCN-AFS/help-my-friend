@@ -689,15 +689,44 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
 
     // Thêm event listeners
     chatBubble.addEventListener('click', () => {
-        chatWindow.style.display = chatWindow.style.display === 'none' ? 'flex' : 'none';
-        if (chatWindow.style.display === 'flex') {
+        if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
+            chatWindow.style.display = 'flex';
             loadChatHistory();
+            // Ẩn chat bubble khi mở chat window
+            chatBubble.style.display = 'none';
         }
     });
 
-    document.getElementById('close-chat').addEventListener('click', () => {
+    document.getElementById('close-chat').addEventListener('click', (e) => {
+        e.stopPropagation(); // Ngăn event bubble lên parent
         chatWindow.style.display = 'none';
+        // Hiện lại chat bubble khi đóng chat window
+        chatBubble.style.display = 'block';
     });
+
+    // Thêm hover effect cho nút đóng
+    chatWindow.querySelector('#close-chat').addEventListener('mouseover', function() {
+        this.style.opacity = '1';
+    });
+    chatWindow.querySelector('#close-chat').addEventListener('mouseout', function() {
+        this.style.opacity = '0.8';
+    });
+
+    // Đảm bảo chat window bắt đầu ở trạng thái ẩn
+    chatWindow.style.display = 'none';
+
+    // Đảm bảo chat bubble hiển thị ban đầu
+    chatBubble.style.display = 'block';
+
+    // Thêm style cho mobile
+    style.textContent += `
+        @media screen and (max-width: 768px) {
+            #close-chat {
+                padding: 15px !important;  /* Tăng vùng chạm cho mobile */
+                font-size: 28px !important;
+            }
+        }
+    `;
 
     const chatText = document.getElementById('chat-text');
     const sendBtn = document.getElementById('send-btn');
