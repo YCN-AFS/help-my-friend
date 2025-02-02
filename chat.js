@@ -133,7 +133,7 @@ MỤC TIÊU:
                     <img src="${THEME.botAvatar}" style="width: 35px; height: 35px; border-radius: 50%;">
                     <div>
                         <div style="font-weight: 500;">Mew</div>
-                        <div style="font-size: 12px; opacity: 0.8;">Người bạn đồng hành của bạn</div>
+                        <div style="font-size: 12px; opacity: 0.8;">Người bạn đồng hành của Ánh</div>
                     </div>
                 </div>
                 <div style="display: flex; gap: 10px;">
@@ -245,7 +245,7 @@ MỤC TIÊU:
         // Cập nhật tin nhắn chào mừng
         const welcomeMessage = `Hey cậu! Tớ là Mew 👋  
 
-Tớ nghe nói dạo này cậu đang gặp nhiều khó khăn và đang cân nhắc việc về Tuyên Quang? Tớ thật sự hiểu mà—đôi khi công việc và cuộc sống ở Sài Gòn có thể quá sức, khiến cậu cảm thấy mệt mỏi và chông chênh.  
+Tớ nghe nói dạo này cậu đang gặp nhiều khó khăn và đang cân nhắc việc về Tuyên Quang? Tớ thật sự hiểu cậu đấy — đôi khi công việc và cuộc sống ở Sài Gòn có thể quá sức, khiến cậu cảm thấy mệt mỏi và chông chênh.  
 
 Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng lòng nhất? Tớ ở đây để lắng nghe, cùng cậu nhìn nhận mọi thứ thật rõ ràng và tìm ra hướng đi phù hợp nhất cho cậu.`;
 
