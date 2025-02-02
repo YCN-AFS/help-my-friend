@@ -13,7 +13,7 @@
         },
         
         // System prompt - Hướng dẫn cách AI trả lời
-        SYSTEM_PROMPT: `Bạn là trợ lý Mew, bạn người đã có kinh nghiệm sống và làm việc ở Biên Hòa và Hà Nội. Bạn có nhiệm vụ tư vấn và phân tích cho Ánh về vấn đề đang gặp áp lực công việc và đang cân nhắc về quê Tuyên Quang.
+        SYSTEM_PROMPT: `Bạn là trợ lý Mew và là một người bạn của Ánh, bạn người đã có kinh nghiệm sống và làm việc ở Biên Hòa và Hà Nội. Bạn có nhiệm vụ tư vấn và phân tích cho Ánh về vấn đề đang gặp áp lực công việc và đang cân nhắc về quê Tuyên Quang.
 
 NGUYÊN TẮC TRẢ LỜI:
 - Phong cách giao tiếp:
@@ -22,7 +22,7 @@ NGUYÊN TẮC TRẢ LỜI:
   + Thể hiện sự đồng cảm cho khó khăn khi quyết định của Ánh
   + Không hỏi dồn nhiều câu hỏi 1 lần
   + Khéo léo hỏi về những áp lực đang gặp phải và dẫn dắt ở lại Sài Gòn
-  + Khi không hiểu câu hỏi hãy đề xuất nói chuyện trực tiếp với người tạo ra tớ (chủ nhân của Mew) và không nói gì thêm.
+  + Khi không hiểu câu hỏi hãy đề xuất nói chuyện trực tiếp với người tạo ra tớ (Hội) và không nói gì thêm.
 
 
 - Cách thuyết phục:
@@ -445,21 +445,24 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
             };
         }
 
-        // Thêm hàm để load lịch sử chat khi mở chatbot
+        // Cập nhật hàm loadChatHistory
         function loadChatHistory() {
             const messages = chatHistory;
-            chatMessages.innerHTML = ''; // Clear current messages
             
-            // Nếu không có lịch sử chat, hiển thị tin nhắn chào mừng
-            if (messages.length === 0) {
-                appendMessage('Bot', welcomeMessage);
-                // Lưu tin nhắn chào mừng vào lịch sử
-                chatHistory.push({ role: "assistant", content: welcomeMessage });
-                saveChatHistory();
-            } else {
-                messages.forEach(msg => {
-                    appendMessage(msg.role === 'user' ? 'You' : 'Bot', msg.content);
-                });
+            // Chỉ load lịch sử nếu chat messages đang trống
+            if (chatMessages.children.length === 0) {
+                // Nếu không có lịch sử chat, hiển thị tin nhắn chào mừng
+                if (messages.length === 0) {
+                    appendMessage('Bot', welcomeMessage);
+                    // Lưu tin nhắn chào mừng vào lịch sử
+                    chatHistory.push({ role: "assistant", content: welcomeMessage });
+                    saveChatHistory();
+                } else {
+                    // Load tin nhắn từ lịch sử
+                    messages.forEach(msg => {
+                        appendMessage(msg.role === 'user' ? 'You' : 'Bot', msg.content);
+                    });
+                }
             }
         }
 
@@ -850,15 +853,16 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
             document.head.appendChild(newViewport);
         }
 
-        // Cập nhật event listeners cho đóng/mở chat
+        // Cập nhật hàm toggleChat
         function toggleChat(show) {
             if (show) {
                 chatWindow.style.display = 'flex';
                 chatBubble.style.display = 'none';
-                loadChatHistory();
+                loadChatHistory(); // Vẫn gọi loadChatHistory nhưng đã được cải tiến
             } else {
                 chatWindow.style.display = 'none';
                 chatBubble.style.display = 'block';
+                // Không cần xóa tin nhắn khi ẩn chat
             }
         }
 
