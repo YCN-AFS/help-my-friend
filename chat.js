@@ -391,7 +391,11 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
 
                 // Đợi 1-2 giây để hiển thị hiệu ứng typing
                 await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 1000));
-                chatMessages.removeChild(typingIndicator);
+
+                // Kiểm tra xem typingIndicator có tồn tại trước khi xóa
+                if (chatMessages.contains(typingIndicator)) {
+                    chatMessages.removeChild(typingIndicator);
+                }
             }
         }
 
@@ -768,6 +772,13 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
                 }
             }
         `;
+
+        // Thêm hàm để xử lý click từ nút "Trò chuyện với Mew"
+        window.startChat = function() {
+            if (chatBubble) {
+                toggleChat(true);
+            }
+        }
     }
 
     // Đợi cho trang load xong mới khởi tạo chat
