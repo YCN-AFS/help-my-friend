@@ -102,7 +102,7 @@ MỤC TIÊU:
 
     // Wrap toàn bộ code khởi tạo trong một hàm
     function initializeChat() {
-        if (isInitialized) return;
+        if (isInitialized || window.innerWidth <= 768) return; // Không khởi tạo trên điện thoại
         isInitialized = true;
 
         // Ẩn chat window và hiện main content
@@ -756,6 +756,18 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
             chatWindow.style.display = 'none';
             chatBubble.style.display = 'block';
         });
+
+        // Thêm style để ẩn khung chat trên điện thoại
+        style.textContent += `
+            @media screen and (max-width: 768px) {
+                #chat-window {
+                    display: none !important; /* Ẩn khung chat trên điện thoại */
+                }
+                #chat-bubble {
+                    display: block !important; /* Hiện chat bubble */
+                }
+            }
+        `;
     }
 
     // Đợi cho trang load xong mới khởi tạo chat
