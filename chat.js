@@ -56,24 +56,24 @@ MỤC TIÊU:
 
     // ===== THEME GIAO DIỆN =====
     const THEME = {
-        // Màu sắc chính
-        primaryColor: '#4a90e2',
-        primaryGradient: 'linear-gradient(135deg, #4a90e2, #7986cb)',
+        // Màu sắc chính - phù hợp với gradient của trang
+        primaryColor: '#667eea',
+        primaryGradient: 'linear-gradient(135deg, #667eea, #764ba2)',
         backgroundColor: '#ffffff',
         
         // Chat window
-        windowWidth: '100vw',  // Full width trên mobile
-        windowHeight: '100vh', // Full height trên mobile
+        windowWidth: '100vw',
+        windowHeight: '100vh',
         windowMinWidth: '280px',
         windowMaxWidth: '1200px',
         windowRadius: '20px',
         
-        // Chat bubble (icon)
+        // Chat bubble
         bubbleSize: 'min(65px, 15vw)',
         bubbleImage: 'https://www.dropbox.com/scl/fi/i6tpooydfgcbdkg9c3z72/images.jpg?rlkey=4hhx538lxbdca8chpigxipp55&st=6r72goym&dl=1',
         
         // Messages
-        userMessageColor: '#2962ff',
+        userMessageColor: '#667eea',  // Cập nhật màu tin nhắn người dùng
         botMessageColor: '#f8f9fa',
         userTextColor: 'white',
         botTextColor: '#2c3e50',
@@ -919,6 +919,259 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
                 toggleChat(true);
             }
         }
+
+        // Thêm style mới cho chat window
+        style.textContent += `
+            #chat-window {
+                background: rgba(255, 255, 255, 0.95) !important;
+                box-shadow: 0 8px 32px rgba(102, 126, 234, 0.15) !important;
+                border: 1px solid rgba(102, 126, 234, 0.2) !important;
+            }
+
+            .chat-header {
+                background: ${THEME.primaryGradient} !important;
+                border-bottom: none !important;
+            }
+
+            #send-btn {
+                background: ${THEME.primaryGradient} !important;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+                transition: all 0.3s ease !important;
+            }
+
+            #send-btn:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+            }
+
+            #chat-bubble {
+                background: ${THEME.primaryGradient} !important;
+                box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3) !important;
+            }
+
+            .chat-message .chat-bubble {
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+            }
+
+            #chat-text {
+                border-color: rgba(102, 126, 234, 0.3) !important;
+                transition: all 0.3s ease !important;
+            }
+
+            #chat-text:focus {
+                border-color: #667eea !important;
+                box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1) !important;
+            }
+
+            .chat-input-container {
+                background: rgba(255, 255, 255, 0.98) !important;
+                border-top: 1px solid rgba(102, 126, 234, 0.1) !important;
+            }
+
+            #chat-messages {
+                background: rgba(248, 249, 250, 0.95) !important;
+            }
+
+            /* Cập nhật style cho tin nhắn */
+            .chat-message[style*="row-reverse"] .chat-bubble {
+                background: ${THEME.primaryGradient} !important;
+                color: white !important;
+            }
+
+            /* Style cho nút clear chat */
+            #clear-chat {
+                background: rgba(255, 255, 255, 0.2) !important;
+                padding: 8px 15px !important;
+                border-radius: 15px !important;
+                transition: all 0.3s ease !important;
+            }
+
+            #clear-chat:hover {
+                background: rgba(255, 255, 255, 0.3) !important;
+            }
+
+            /* Hiệu ứng loading */
+            .typing-dot {
+                background: #667eea !important;
+            }
+
+            /* Dark mode adjustments */
+            @media (prefers-color-scheme: dark) {
+                #chat-window {
+                    background: rgba(255, 255, 255, 0.98) !important;
+                }
+                
+                #chat-messages {
+                    background: rgba(248, 249, 250, 0.95) !important;
+                }
+                
+                .chat-input-container {
+                    background: rgba(255, 255, 255, 0.98) !important;
+                    border-top-color: rgba(102, 126, 234, 0.1) !important;
+                }
+                
+                #chat-text {
+                    background: white !important;
+                    color: #2c3e50 !important;
+                }
+            }
+        `;
+
+        // Thêm style mới cho desktop
+        style.textContent += `
+            @media screen and (min-width: 769px) {
+                #chat-window {
+                    width: 380px !important;
+                    height: 600px !important;
+                    bottom: 100px !important;
+                    right: 30px !important;
+                    border-radius: 25px !important;
+                    backdrop-filter: blur(10px) !important;
+                    background: rgba(255, 255, 255, 0.98) !important;
+                    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.2) !important;
+                    border: 1px solid rgba(102, 126, 234, 0.2) !important;
+                    transition: all 0.3s ease !important;
+                }
+
+                #chat-window:hover {
+                    transform: translateY(-5px) !important;
+                    box-shadow: 0 15px 50px rgba(102, 126, 234, 0.25) !important;
+                }
+
+                .chat-header {
+                    padding: 20px 25px !important;
+                    border-radius: 25px 25px 0 0 !important;
+                }
+
+                .chat-header img {
+                    width: 45px !important;
+                    height: 45px !important;
+                }
+
+                .chat-header div > div:first-child {
+                    font-size: 18px !important;
+                    font-weight: 600 !important;
+                }
+
+                .chat-header div > div:last-child {
+                    font-size: 14px !important;
+                }
+
+                #chat-messages {
+                    padding: 25px !important;
+                    height: calc(100% - 160px) !important;
+                }
+
+                .chat-message {
+                    margin: 15px 0 !important;
+                }
+
+                .chat-bubble {
+                    padding: 15px 20px !important;
+                    font-size: 15px !important;
+                    line-height: 1.5 !important;
+                    max-width: 80% !important;
+                }
+
+                .chat-input-container {
+                    padding: 20px 25px !important;
+                    gap: 15px !important;
+                }
+
+                #chat-text {
+                    padding: 15px 20px !important;
+                    font-size: 15px !important;
+                    min-height: 50px !important;
+                    border-radius: 15px !important;
+                    transition: all 0.3s ease !important;
+                }
+
+                #chat-text:focus {
+                    transform: translateY(-1px) !important;
+                }
+
+                #send-btn {
+                    height: 50px !important;
+                    font-size: 16px !important;
+                    font-weight: 600 !important;
+                    letter-spacing: 0.5px !important;
+                    border-radius: 15px !important;
+                }
+
+                #chat-bubble {
+                    width: 70px !important;
+                    height: 70px !important;
+                    bottom: 30px !important;
+                    right: 30px !important;
+                    border-radius: 35px !important;
+                    transition: all 0.3s ease !important;
+                }
+
+                #chat-bubble:hover {
+                    transform: scale(1.05) !important;
+                    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
+                }
+
+                #clear-chat {
+                    padding: 8px 20px !important;
+                    font-size: 14px !important;
+                    opacity: 0.9 !important;
+                }
+
+                #close-chat {
+                    font-size: 28px !important;
+                    padding: 15px !important;
+                }
+
+                /* Cải thiện scrollbar cho desktop */
+                #chat-messages::-webkit-scrollbar {
+                    width: 8px !important;
+                }
+
+                #chat-messages::-webkit-scrollbar-track {
+                    background: transparent !important;
+                    border-radius: 4px !important;
+                }
+
+                #chat-messages::-webkit-scrollbar-thumb {
+                    background: rgba(102, 126, 234, 0.2) !important;
+                    border-radius: 4px !important;
+                    transition: all 0.3s ease !important;
+                }
+
+                #chat-messages::-webkit-scrollbar-thumb:hover {
+                    background: rgba(102, 126, 234, 0.4) !important;
+                }
+
+                /* Hiệu ứng hover cho các nút */
+                #send-btn:hover {
+                    transform: translateY(-2px) !important;
+                    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3) !important;
+                }
+
+                #clear-chat:hover {
+                    opacity: 1 !important;
+                    transform: translateY(-1px) !important;
+                }
+
+                /* Hiệu ứng cho tin nhắn */
+                .chat-message {
+                    opacity: 0;
+                    animation: fadeInMessage 0.3s ease forwards;
+                }
+
+                @keyframes fadeInMessage {
+                    from {
+                        opacity: 0;
+                        transform: translateY(10px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            }
+        `;
     }
 
     // Đợi cho trang load xong mới khởi tạo chat
