@@ -3,484 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mew - Người bạn đồng hành</title>
-    <link rel="icon" href="icon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Nội dung đã bị xóa</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Arial', sans-serif;
         }
 
         body {
             background: linear-gradient(135deg, #667eea, #764ba2);
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             color: #fff;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
             padding: 20px;
         }
 
-        .header {
-            text-align: center;
-            padding: 60px 0;
-            position: relative;
-        }
-
-        .header h1 {
-            font-size: 3em;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-
-        .content-box {
+        .container {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            border-radius: 30px;
+            border-radius: 20px;
             padding: 40px;
-            margin-bottom: 40px;
+            max-width: 600px;
+            text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
         }
 
-        .welcome-message {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 25px;
-            border-radius: 20px;
-            margin-bottom: 30px;
-            backdrop-filter: blur(10px);
-            line-height: 1.6;
+        h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
 
-        .welcome-message p {
-            margin-bottom: 15px;
+        p {
             font-size: 1.1em;
-            color: #fff;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.12);
-            border-radius: 20px;
-            padding: 30px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .feature-card h3 {
-            font-size: 1.5em;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .feature-card p {
-            font-size: 1em;
             line-height: 1.6;
-            opacity: 0.9;
+            margin-bottom: 25px;
         }
 
-        .feature-list {
-            list-style: none;
-            margin-top: 15px;
-        }
-
-        .feature-list li {
-            position: relative;
-            padding-left: 20px;
-            margin-bottom: 12px;
-            line-height: 1.5;
-        }
-
-        .feature-list li:before {
-            content: '✨';
-            position: absolute;
-            left: -5px;
-            color: #fff;
-        }
-
-        .chat-section {
-            text-align: center;
-            margin-top: 40px;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-        }
-
-        .start-chat-btn {
+        .home-button {
             background: linear-gradient(45deg, #FF6B6B, #FF8E8E);
-            font-size: 1.1em;
-            padding: 15px 30px;
-            border-radius: 30px;
+            padding: 12px 30px;
+            border-radius: 25px;
             border: none;
             color: white;
+            font-size: 1.1em;
             cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .start-chat-btn:hover {
+        .home-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
         }
 
-        @media screen and (max-width: 768px) {
-            .header h1 {
-                font-size: 2em;
-            }
-
-            .content-box {
-                padding: 20px;
-            }
-
-            .feature-card {
-                padding: 20px;
-            }
-        }
-
-        /* Animation */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .header, .feature-card {
-            animation: fadeInUp 0.6s ease forwards;
-        }
-
-        .feature-card:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .feature-card:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        /* Update Loading Screen Styles */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;  /* Use viewport height */
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease-out;
-        }
-
-        .loading-content {
-            text-align: center;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .cat-loader {
-            width: 80px;
-            height: 80px;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0 auto 20px;
-        }
-
-        .cat-loader::before {
-            content: "🐱";
-            font-size: 50px;
-            position: absolute;
-            animation: bounce 0.8s infinite alternate;
-            transform-origin: center;
-        }
-
-        @keyframes bounce {
-            from { 
-                transform: translateY(-15px); 
-            }
-            to { 
-                transform: translateY(15px); 
-            }
-        }
-
-        .loading-text {
-            font-size: 1.5em;
-            margin: 20px 0;
-            opacity: 0;
-            animation: fadeInOut 2s infinite;
-            width: 100%;
-            text-align: center;
-        }
-
-        .loading-progress {
-            width: 200px;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 0 auto;
-        }
-
-        .progress-bar {
-            width: 0%;
-            height: 100%;
-            background: white;
-            border-radius: 3px;
-            transition: width 2s ease-in-out;
-        }
-
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-
-        /* Hide main content initially */
-        .main-content {
-            opacity: 0;
-            transition: opacity 0.5s ease-in;
-        }
-
-        .main-content.visible {
-            opacity: 1;
-        }
-
-        .memory-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 20px;
-        }
-
-        .memory-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-
-        .memory-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .memory-card i {
-            font-size: 2em;
-            color: #fff;
-            margin-bottom: 15px;
-        }
-
-        .memory-card h3 {
-            color: #fff;
-            margin-bottom: 10px;
-            font-size: 1.2em;
-        }
-
-        .memory-card p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9em;
-            line-height: 1.6;
-        }
-
-        .content-section {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        .content-section h2 {
-            color: #fff;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2em;
+        .emoji {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: block;
         }
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div class="loading-screen" id="loadingScreen">
-        <div class="loading-content">
-            <div class="cat-loader"></div>
-            <div class="loading-text">Đang kết nối với Mew...</div>
-            <div class="loading-progress">
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
-        </div>
+    <div class="container">
+        <span class="emoji">🔒</span>
+        <h1>Nội dung đã dừng chia sẻ</h1>
+        <p>Nội dung này hiện không còn được chia sẻ công khai. Vui lòng liên hệ với chủ sở hữu để biết thêm thông tin.</p>
+        <a href="/" class="home-button">Quay về trang chủ</a>
     </div>
-
-    <!-- Main Content -->
-    <div class="main-content" id="mainContent">
-        <div class="container">
-            <header class="header">
-                <h1>👋 Chào Ánh!</h1>
-                <p>Tớ là Mew - người bạn sẽ luôn lắng nghe và đồng hành cùng cậu</p>
-            </header>
-
-            <div class="content-box">
-                <div class="welcome-message">
-                    <p>Này cậu! Tớ nghe nói dạo này cậu đang có nhiều điều trăn trở về việc ở lại Sài Gòn. Tớ hiểu mà - đôi khi cuộc sống ở thành phố lớn không dễ dàng chút nào.</p>
-                    <p>Nhưng trước khi quyết định gì, cùng tớ nhìn lại hành trình 5 năm của cậu nhé! 💫</p>
-                </div>
-
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <h3>🌸 Những điều cậu đã gây dựng</h3>
-                        <ul class="feature-list">
-                            <li>Tình bạn thân thiết với chị Như và nhiều người bạn tuyệt vời khác</li>
-                            <li>Sự nghiệp trong ngành du lịch đang phát triển tốt</li>
-                            <li>Cuộc sống tự lập đáng tự hào</li>
-                            <li>Những kỷ niệm đẹp ở thành phố này</li>
-                        </ul>
-                    </div>
-
-                    <div class="feature-card">
-                        <h3>💝 Tớ hiểu cậu đang lo lắng về</h3>
-                        <ul class="feature-list">
-                            <li>Áp lực công việc đôi lúc quá tải</li>
-                            <li>Nỗi nhớ gia đình mỗi ngày một lớn</li>
-                            <li>Cuộc sống bận rộn khó cân bằng</li>
-                            <li>Đôi khi cảm thấy cô đơn giữa phố thị</li>
-                        </ul>
-                    </div>
-
-
-                    <div class="feature-card">
-                        <h3>💫 Tớ sẽ ở đây cùng cậu</h3>
-                        <ul class="feature-list">
-                            <li>Tìm cách làm việc thông minh hơn, đỡ mệt hơn</li>
-                            <li>Hỗ trợ cậu tìm kiếm công việc thật ưng ý</li>
-                            <li>Rủ cậu đi chơi, khám phá những góc Sài Gòn thú vị</li>
-                            <li>Làm cho mỗi ngày ở đây vui vẻ và có ý nghĩa hơn</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="chat-section">
-                <p style="margin-bottom: 20px; font-size: 1.1em;">
-                    Ánh ơi, trước khi quyết định về Tuyên Quang, hãy cùng Mew trò chuyện và tìm hướng giải quyết nhé!
-                </p>
-                <button class="start-chat-btn" onclick="startChat()">
-                    Trò chuyện với Mew
-                </button>
-            </div>
-
-            <div class="content-section">
-                <h2>Hành trình 5 năm tại Sài Gòn</h2>
-                <div class="memory-grid">
-                    <div class="memory-card">
-                        <i class="fas fa-users"></i>
-                        <h3>Những tình bạn quý giá</h3>
-                        <p>Những người bạn như chị Như, những đồng nghiệp thân thiết, và cả những người đã luôn bên cạnh động viên trong suốt 5 năm qua.</p>
-                    </div>
-                    
-                    <div class="memory-card">
-                        <i class="fas fa-briefcase"></i>
-                        <h3>Sự nghiệp đang phát triển</h3>
-                        <p>Thành công chưa bao giờ dễ dàng, nhưng cậu có tài năng, có thời gian và vô số cơ hội để tỏa sáng. Mọi thử thách chỉ là bước đệm giúp cậu mạnh mẽ hơn. Hãy vững tin và tiếp tục tiến bước  - cậu sẽ làm được.</p>
-                    </div>
-
-                    <div class="memory-card">
-                        <i class="fas fa-star"></i>
-                        <h3>Thành quả đã đạt được</h3>
-                        <p>Mới ra trường tìm được công việc tốt không hề dễ, nhưng cậu đã làm được điều đó – điều mà không phải ai cũng làm được. Cố gắng lên nhé, mình tin cậu sẽ còn tiến xa hơn nữa!</p>
-                    </div>
-
-                    <div class="memory-card">
-                        <i class="fas fa-heart"></i>
-                        <h3>Kỷ niệm đáng nhớ</h3>
-                        <p>Những buổi cà phê đong đầy tâm sự, những chuyến đi khám phá từng góc phố, và cả những khoảnh khắc cùng nhau vượt qua khó khăn – tất cả đều là những kỷ niệm quý giá.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const loadingScreen = document.getElementById('loadingScreen');
-            const mainContent = document.getElementById('mainContent');
-            const progressBar = document.getElementById('progressBar');
-            const catSound = new Audio('cat-open.mp3');
-            
-            // Thêm biến để kiểm tra đã load xong chưa
-            let isLoaded = false;
-
-            // Animate progress bar
-            setTimeout(() => {
-                progressBar.style.width = '100%';
-            }, 100);
-
-            // Hide loading screen and show main content after animation
-            setTimeout(() => {
-                loadingScreen.style.opacity = '0';
-                mainContent.classList.add('visible');
-                isLoaded = true;
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                }, 500);
-            }, 3500);
-
-            // Thêm event listener cho tương tác đầu tiên của user
-            document.addEventListener('click', function playAudioOnFirstClick() {
-                if (isLoaded) {
-                    catSound.play().catch(err => console.log('Audio play failed:', err));
-                    // Xóa event listener sau lần click đầu tiên
-                    document.removeEventListener('click', playAudioOnFirstClick);
-                }
-            }, { once: true });
-        });
-
-        // Cập nhật hàm startChat để phát âm thanh khi click vào nút chat
-        window.startChat = function() {
-            const catSound = new Audio('cat-open.mp3');
-            catSound.play()
-                .then(() => {
-                    if (typeof toggleChat === 'function') {
-                        toggleChat(true);
-                    }
-                })
-                .catch(err => {
-                    console.log('Audio play failed:', err);
-                    if (typeof toggleChat === 'function') {
-                        toggleChat(true);
-                    }
-                });
-        };
-    </script>
-
-    <script src="chat.js"></script>
 </body>
 </html> 
