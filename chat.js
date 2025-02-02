@@ -451,17 +451,17 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
             
             // Chỉ load lịch sử nếu chat messages đang trống
             if (chatMessages.children.length === 0) {
-                // Nếu không có lịch sử chat, hiển thị tin nhắn chào mừng
-                if (messages.length === 0) {
-                    appendMessage('Bot', welcomeMessage);
-                    // Lưu tin nhắn chào mừng vào lịch sử
-                    chatHistory.push({ role: "assistant", content: welcomeMessage });
-                    saveChatHistory();
-                } else {
+            // Nếu không có lịch sử chat, hiển thị tin nhắn chào mừng
+            if (messages.length === 0) {
+                appendMessage('Bot', welcomeMessage);
+                // Lưu tin nhắn chào mừng vào lịch sử
+                chatHistory.push({ role: "assistant", content: welcomeMessage });
+                saveChatHistory();
+            } else {
                     // Load tin nhắn từ lịch sử
-                    messages.forEach(msg => {
-                        appendMessage(msg.role === 'user' ? 'You' : 'Bot', msg.content);
-                    });
+                messages.forEach(msg => {
+                    appendMessage(msg.role === 'user' ? 'You' : 'Bot', msg.content);
+                });
                 }
             }
         }
@@ -775,25 +775,26 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
         });
 
         // Thêm xử lý vuốt để đóng chat trên mobile
-        let touchStartY = 0;
-        let touchEndY = 0;
-
-        chatWindow.addEventListener('touchstart', (e) => {
-            touchStartY = e.touches[0].clientY;
-        });
-
-        chatWindow.addEventListener('touchmove', (e) => {
-            touchEndY = e.touches[0].clientY;
-        });
-
-        chatWindow.addEventListener('touchend', () => {
-            const swipeDistance = touchEndY - touchStartY;
-            if (swipeDistance > 100) { // Vuốt xuống > 100px
-                chatWindow.style.display = 'none';
-            }
-            touchStartY = 0;
-            touchEndY = 0;
-        });
+        // Xóa phần xử lý vuốt để đóng chat
+        // let touchStartY = 0;
+        // let touchEndY = 0;
+        // 
+        // chatWindow.addEventListener('touchstart', (e) => {
+        //     touchStartY = e.touches[0].clientY;
+        // });
+        // 
+        // chatWindow.addEventListener('touchmove', (e) => {
+        //     touchEndY = e.touches[0].clientY;
+        // });
+        // 
+        // chatWindow.addEventListener('touchend', () => {
+        //     const swipeDistance = touchEndY - touchStartY;
+        //     if (swipeDistance > 100) { // Vuốt xuống > 100px
+        //         chatWindow.style.display = 'none';
+        //     }
+        //     touchStartY = 0;
+        //     touchEndY = 0;
+        // });
 
         // Thêm meta viewport nếu chưa có
         if (!document.querySelector('meta[name="viewport"]')) {
@@ -882,7 +883,7 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
 
         // Thêm style mới cho chat window
         style.textContent += `
-            #chat-window {
+                #chat-window {
                 background: rgba(255, 255, 255, 0.95) !important;
                 box-shadow: 0 8px 32px rgba(102, 126, 234, 0.15) !important;
                 border: 1px solid rgba(102, 126, 234, 0.2) !important;
@@ -904,7 +905,7 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
                 box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
             }
 
-            #chat-bubble {
+                #chat-bubble {
                 background: ${THEME.primaryGradient} !important;
                 box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3) !important;
             }
