@@ -102,7 +102,7 @@ MỤC TIÊU:
 
     // Wrap toàn bộ code khởi tạo trong một hàm
     function initializeChat() {
-        if (isInitialized || window.innerWidth <= 768) return; // Không khởi tạo trên điện thoại
+        if (isInitialized) return; // Chỉ kiểm tra đã khởi tạo, bỏ điều kiện kiểm tra width
         isInitialized = true;
 
         // Ẩn chat window và hiện main content
@@ -563,9 +563,29 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
         // Thêm style cho mobile
         style.textContent += `
             @media screen and (max-width: 768px) {
-                #close-chat {
-                    padding: 15px !important;  /* Tăng vùng chạm cho mobile */
-                    font-size: 28px !important;
+                #chat-window {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    width: 100% !important;
+                    height: 100% !important;
+                    max-width: none;
+                    border-radius: 0;
+                    margin: 0;
+                }
+                
+                #chat-bubble {
+                    bottom: 20px;
+                    right: 20px;
+                    width: 50px;
+                    height: 50px;
+                }
+                
+                .chat-input-container {
+                    padding: 10px;
+                    padding-bottom: env(safe-area-inset-bottom, 10px); /* iOS safe area */
                 }
             }
         `;
@@ -760,18 +780,6 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
             chatWindow.style.display = 'none';
             chatBubble.style.display = 'block';
         });
-
-        // Thêm style để ẩn khung chat trên điện thoại
-        style.textContent += `
-            @media screen and (max-width: 768px) {
-                #chat-window {
-                    display: none !important; /* Ẩn khung chat trên điện thoại */
-                }
-                #chat-bubble {
-                    display: block !important; /* Hiện chat bubble */
-                }
-            }
-        `;
 
         // Thêm hàm để xử lý click từ nút "Trò chuyện với Mew"
         window.startChat = function() {
