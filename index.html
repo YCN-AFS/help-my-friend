@@ -124,94 +124,25 @@
             text-align: center;
             margin-top: 40px;
             padding: 30px;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
         .start-chat-btn {
             background: linear-gradient(45deg, #FF6B6B, #FF8E8E);
-            font-size: 1.2em;
-            padding: 18px 35px;
+            font-size: 1.1em;
+            padding: 15px 30px;
             border-radius: 30px;
             border: none;
             color: white;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
-            position: relative;
-            overflow: hidden;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .start-chat-btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
-            background: linear-gradient(45deg, #FF8E8E, #FF6B6B);
-        }
-
-        .start-chat-btn:active {
-            transform: translateY(1px);
-        }
-
-        .start-chat-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                120deg,
-                transparent,
-                rgba(255, 255, 255, 0.3),
-                transparent
-            );
-            transition: 0.5s;
-        }
-
-        .start-chat-btn:hover::before {
-            left: 100%;
-        }
-
-        /* Animation pulse */
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4);
-            }
-            70% {
-                box-shadow: 0 0 0 15px rgba(255, 107, 107, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
-            }
-        }
-
-        .start-chat-btn {
-            animation: pulse 2s infinite;
-        }
-
-        /* Mobile responsive */
-        @media screen and (max-width: 768px) {
-            .start-chat-btn {
-                font-size: 1.1em;
-                padding: 15px 25px;
-                width: 100%;
-                max-width: 300px;
-                margin: 0 auto;
-            }
-        }
-
-        .chat-section p {
-            margin-bottom: 25px;
-            font-size: 1.2em;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            font-weight: 500;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
         }
 
         @media screen and (max-width: 768px) {
@@ -501,21 +432,52 @@
             const loadingScreen = document.getElementById('loadingScreen');
             const mainContent = document.getElementById('mainContent');
             const progressBar = document.getElementById('progressBar');
+            const catSound = new Audio('cat-open.mp3');
+            
+            // Thêm biến để kiểm tra đã load xong chưa
+            let isLoaded = false;
 
             // Animate progress bar
             setTimeout(() => {
                 progressBar.style.width = '100%';
             }, 100);
 
-            // Hide loading screen and show main content after 2 seconds
+            // Hide loading screen and show main content after animation
             setTimeout(() => {
                 loadingScreen.style.opacity = '0';
                 mainContent.classList.add('visible');
+                isLoaded = true;
                 setTimeout(() => {
                     loadingScreen.style.display = 'none';
                 }, 500);
             }, 3500);
+
+            // Thêm event listener cho tương tác đầu tiên của user
+            document.addEventListener('click', function playAudioOnFirstClick() {
+                if (isLoaded) {
+                    catSound.play().catch(err => console.log('Audio play failed:', err));
+                    // Xóa event listener sau lần click đầu tiên
+                    document.removeEventListener('click', playAudioOnFirstClick);
+                }
+            }, { once: true });
         });
+
+        // Cập nhật hàm startChat để phát âm thanh khi click vào nút chat
+        window.startChat = function() {
+            const catSound = new Audio('cat-open.mp3');
+            catSound.play()
+                .then(() => {
+                    if (typeof toggleChat === 'function') {
+                        toggleChat(true);
+                    }
+                })
+                .catch(err => {
+                    console.log('Audio play failed:', err);
+                    if (typeof toggleChat === 'function') {
+                        toggleChat(true);
+                    }
+                });
+        };
     </script>
 
     <script src="chat.js"></script>

@@ -22,7 +22,7 @@ NGUYÊN TẮC TRẢ LỜI:
   + Thể hiện sự đồng cảm cho khó khăn khi quyết định của Ánh
   + Không hỏi dồn nhiều câu hỏi 1 lần
   + Khéo léo hỏi về những áp lực đang gặp phải và dẫn dắt ở lại Sài Gòn
-  + Khi không hiểu câu hỏi hãy đề xuất nói chuyện trực tiếp với người tạo ra tớ (chủ nhân của Mew)
+  + Khi không hiểu câu hỏi hãy đề xuất nói chuyện trực tiếp với người tạo ra tớ (chủ nhân của Mew) và không nói gì thêm.
 
 
 - Cách thuyết phục:
@@ -99,6 +99,12 @@ MỤC TIÊU:
 
     // Thêm biến để kiểm soát trạng thái khởi tạo
     let isInitialized = false;
+
+    // Thêm vào đầu file, sau phần CONFIG
+    const AUDIO = {
+        catOpen: new Audio('cat-open.mp3'),
+        notification: new Audio('notification.mp3')
+    };
 
     // Wrap toàn bộ code khởi tạo trong một hàm
     function initializeChat() {
@@ -322,10 +328,7 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
             bubble.style.backgroundColor = isUser ? THEME.userMessageColor : THEME.botMessageColor;
             bubble.style.color = isUser ? THEME.userTextColor : THEME.botTextColor;
             
-            // Thêm class để MathJax có thể nhận diện
             bubble.classList.add('math-content');
-            
-            // Sử dụng marked để parse Markdown
             bubble.innerHTML = marked.parse(message);
 
             messageElement.appendChild(avatar);
@@ -333,75 +336,15 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
             
-            // Đảm bảo MathJax đã được load trước khi render
             if (window.MathJax) {
                 MathJax.typesetPromise([bubble]).catch((err) => console.log('MathJax error:', err));
             }
             
             saveChatHistory();
 
-            // Lưu vào Google Doc
-            if (SCRIPT_URL) {
-                try {
-                    // Tạo form ẩn
-                    const form = document.createElement('form');
-                    form.style.display = 'none';
-                    form.method = 'POST';
-                    form.action = SCRIPT_URL;
-                    form.target = 'hidden_iframe';
-
-                    // Thêm dữ liệu vào form
-                    const roleInput = document.createElement('input');
-                    roleInput.name = 'role';
-                    roleInput.value = sender === 'You' ? 'user' : 'assistant';
-                    form.appendChild(roleInput);
-
-                    const contentInput = document.createElement('input');
-                    contentInput.name = 'content';
-                    contentInput.value = message;
-                    form.appendChild(contentInput);
-
-                    // Tạo iframe ẩn để nhận response
-                    const iframe = document.createElement('iframe');
-                    iframe.name = 'hidden_iframe';
-                    iframe.style.display = 'none';
-                    document.body.appendChild(iframe);
-                    document.body.appendChild(form);
-
-                    // Submit form
-                    form.submit();
-
-                    // Cleanup sau 2 giây
-                    setTimeout(() => {
-                        document.body.removeChild(form);
-                        document.body.removeChild(iframe);
-                    }, 2000);
-
-                } catch (error) {
-                    console.error('Error saving chat history:', error);
-                    // Tiếp tục hiển thị chat ngay cả khi lưu thất bại
-                }
-            }
-
-            // Nếu là bot message, thêm hiệu ứng typing
+            // Nếu là tin nhắn từ bot, phát âm thanh thông báo
             if (sender === 'Bot') {
-                const typingIndicator = document.createElement('div');
-                typingIndicator.className = 'typing-indicator';
-                typingIndicator.innerHTML = `
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                `;
-                chatMessages.appendChild(typingIndicator);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-
-                // Đợi 1-2 giây để hiển thị hiệu ứng typing
-                await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 1000));
-
-                // Kiểm tra xem typingIndicator có tồn tại trước khi xóa
-                if (chatMessages.contains(typingIndicator)) {
-                    chatMessages.removeChild(typingIndicator);
-                }
+                AUDIO.notification.play().catch(err => console.log('Notification sound failed:', err));
             }
         }
 
@@ -543,6 +486,7 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
 
         // Thêm event listeners
         chatBubble.addEventListener('click', () => {
+            AUDIO.catOpen.play().catch(err => console.log('Audio play failed:', err));
             toggleChat(true);
         });
 
@@ -725,34 +669,45 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
         const chatText = document.getElementById('chat-text');
         const sendBtn = document.getElementById('send-btn');
         const chatMessages = document.getElementById('chat-messages');
+        const chatInputContainer = document.querySelector('.chat-input-container');
 
         // Cập nhật event listener cho nút gửi
         sendBtn.addEventListener('click', async () => {
             const message = chatText.value.trim();
             if (message) {
                 try {
-                    // Thêm class sending cho input container
-                    document.querySelector('.chat-input-container').classList.add('sending');
-                    
                     // Disable input và nút gửi
                     chatText.disabled = true;
                     sendBtn.disabled = true;
+                    chatInputContainer.classList.add('sending');
 
                     appendMessage('You', message);
                     chatText.value = '';
                     
-                    // Gọi API và hiển thị response
+                    // Lưu tin nhắn người dùng vào lịch sử và Google Script
+                    chatHistory.push({ role: "user", content: message });
+                    saveChatHistory();
+                    await saveToGoogleScript('user', message);
+
+                    // Lấy phản hồi từ bot
                     const response = await fetchGeminiResponse(message);
+                    
+                    // Hiển thị tin nhắn bot
                     appendMessage('Bot', response);
 
+                    // Lưu tin nhắn bot vào lịch sử và Google Script
+                    chatHistory.push({ role: "assistant", content: response });
+                    saveChatHistory();
+                    await saveToGoogleScript('assistant', response);
+
                 } catch (error) {
-                    console.error('Error in send button handler:', error);
-                    appendMessage('Bot', "Xin lỗi, có lỗi xảy ra. Hãy thử lại!");
+                    console.error('Error:', error);
+                    appendMessage('Bot', 'Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau.');
                 } finally {
-                    // Luôn đảm bảo reset UI state
-                    document.querySelector('.chat-input-container').classList.remove('sending');
+                    // Enable lại input và nút gửi
                     chatText.disabled = false;
                     sendBtn.disabled = false;
+                    chatInputContainer.classList.remove('sending');
                     chatText.focus();
                 }
             }
@@ -916,6 +871,7 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
         // Thêm hàm để xử lý click từ nút "Trò chuyện với Mew"
         window.startChat = function() {
             if (chatBubble) {
+                AUDIO.catOpen.play().catch(err => console.log('Audio play failed:', err));
                 toggleChat(true);
             }
         }
@@ -980,14 +936,29 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
 
             /* Style cho nút clear chat */
             #clear-chat {
-                background: rgba(255, 255, 255, 0.2) !important;
-                padding: 8px 15px !important;
-                border-radius: 15px !important;
-                transition: all 0.3s ease !important;
+                background: none !important;
+                border: none !important;
+                color: white !important;
+                cursor: pointer !important;
+                padding: 5px !important;
+                opacity: 0.8 !important;
+                transition: opacity 0.3s ease !important;
             }
 
             #clear-chat:hover {
-                background: rgba(255, 255, 255, 0.3) !important;
+                opacity: 1 !important;
+            }
+
+            /* Xóa bỏ các style không mong muốn */
+            #clear-chat {
+                background: none !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+            }
+
+            /* Reset các style khác có thể ảnh hưởng */
+            .chat-header button#clear-chat {
+                background: none !important;
             }
 
             /* Hiệu ứng loading */
@@ -1172,11 +1143,58 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
                 }
             }
         `;
+
+        // Thêm hàm để điều chỉnh âm lượng (tùy chọn)
+        function setNotificationVolume(volume) { // volume từ 0.0 đến 1.0
+            AUDIO.notification.volume = volume;
+        }
+
+        // Đặt âm lượng mặc định (tùy chọn)
+        setNotificationVolume(0.5); // Đặt âm lượng ở mức 50%
+
+        // Thêm hàm riêng để lưu vào Google Script
+        async function saveToGoogleScript(role, content) {
+            if (!SCRIPT_URL) return;
+
+            try {
+                const form = document.createElement('form');
+                form.style.display = 'none';
+                form.method = 'POST';
+                form.action = SCRIPT_URL;
+                form.target = 'hidden_iframe';
+
+                const roleInput = document.createElement('input');
+                roleInput.name = 'role';
+                roleInput.value = role;
+                form.appendChild(roleInput);
+
+                const contentInput = document.createElement('input');
+                contentInput.name = 'content';
+                contentInput.value = content;
+                form.appendChild(contentInput);
+
+                const iframe = document.createElement('iframe');
+                iframe.name = 'hidden_iframe';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                document.body.appendChild(form);
+
+                form.submit();
+
+                // Cleanup sau 2 giây
+                setTimeout(() => {
+                    document.body.removeChild(form);
+                    document.body.removeChild(iframe);
+                }, 2000);
+
+            } catch (error) {
+                console.error('Error saving to Google Script:', error);
+            }
+        }
     }
 
     // Đợi cho trang load xong mới khởi tạo chat
     document.addEventListener('DOMContentLoaded', function() {
-        // Ẩn loading screen và hiện main content
         const loadingScreen = document.getElementById('loadingScreen');
         const mainContent = document.getElementById('mainContent');
 
@@ -1186,17 +1204,19 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
                 if (mainContent) {
                     mainContent.style.display = 'block';
                     mainContent.classList.add('visible');
+                    // Phát âm thanh khi loading xong
+                    AUDIO.catOpen.play().catch(err => console.log('Audio play failed:', err));
                 }
                 setTimeout(() => {
                     loadingScreen.style.display = 'none';
-                    // Khởi tạo chat sau khi main content đã hiển thị
                     initializeChat();
                 }, 500);
             }, 2000);
         } else {
-            // Nếu không có loading screen, khởi tạo chat ngay
             if (mainContent) {
                 mainContent.style.display = 'block';
+                // Phát âm thanh khi không có loading screen
+                AUDIO.catOpen.play().catch(err => console.log('Audio play failed:', err));
             }
             initializeChat();
         }
