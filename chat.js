@@ -378,6 +378,53 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
     // Thêm URL của Google Script Web App
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw1nbaidJJA0T1Sg5Ay-qxjns8m025FSKZoHZr7R7kLWO4s3Xr2txAyZiODIcqrENYU/exec';
 
+    // Thêm CSS cho hiệu ứng
+    style.textContent += `
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 10px 15px;
+            margin: 10px 0;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #b6b6b6;
+            border-radius: 50%;
+            animation: typingAnimation 1.4s infinite;
+            opacity: 0.7;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingAnimation {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        .chat-input-container.sending {
+            position: relative;
+        }
+
+        .chat-input-container.sending::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, ${THEME.primaryColor}, transparent);
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    `;
+
     // Cập nhật hàm appendMessage
     async function appendMessage(sender, message) {
         const messageElement = document.createElement("div");
@@ -456,6 +503,23 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
                 console.error('Error saving chat history:', error);
                 // Tiếp tục hiển thị chat ngay cả khi lưu thất bại
             }
+        }
+
+        // Nếu là bot message, thêm hiệu ứng typing
+        if (sender === 'Bot') {
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'typing-indicator';
+            typingIndicator.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            chatMessages.appendChild(typingIndicator);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Đợi 1-2 giây để hiển thị hiệu ứng typing
+            await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 1000));
+            chatMessages.removeChild(typingIndicator);
         }
     }
 
@@ -559,11 +623,25 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
     sendBtn.addEventListener('click', async () => {
         const message = chatText.value.trim();
         if (message) {
+            // Thêm class sending cho input container
+            document.querySelector('.chat-input-container').classList.add('sending');
+            
+            // Disable input và nút gửi
+            chatText.disabled = true;
+            sendBtn.disabled = true;
+
             appendMessage('You', message);
             chatText.value = '';
             
             // Gọi API và hiển thị response
             const response = await fetchGeminiResponse(message);
+            
+            // Remove sending class và enable input
+            document.querySelector('.chat-input-container').classList.remove('sending');
+            chatText.disabled = false;
+            sendBtn.disabled = false;
+            chatText.focus();
+
             appendMessage('Bot', response);
         }
     });
@@ -654,5 +732,18 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
         viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
         document.head.appendChild(viewport);
     }
+
+    // Cập nhật style cho nút và input khi disabled
+    style.textContent += `
+        #chat-text:disabled,
+        #send-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .chat-input-container.sending #chat-text {
+            background: #f5f5f5;
+        }
+    `;
 })();
   
