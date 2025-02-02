@@ -275,8 +275,9 @@ MỤC TIÊU:
     // Tạo chat window
     const chatWindow = document.createElement("div");
     chatWindow.id = "chat-window";
+    chatWindow.style.display = 'none'; // Đảm bảo ẩn ngay từ đầu
 
-    // Cập nhật HTML của chat window trước
+    // Cập nhật HTML của chat window
     chatWindow.innerHTML = `
         <div class="chat-header">
             <div style="display: flex; align-items: center; gap: 10px;">
@@ -290,7 +291,7 @@ MỤC TIÊU:
                 <button id="clear-chat" style="background: none; border: none; color: white; cursor: pointer; padding: 5px;">
                     🗑️ Xóa
                 </button>
-                <button id="close-chat" style="background: none; border: none; color: white; cursor: pointer; font-size: 24px;">
+                <button id="close-chat" style="background: none; border: none; color: white; cursor: pointer; font-size: 24px; padding: 10px;">
                     ×
                 </button>
             </div>
@@ -689,19 +690,13 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
 
     // Thêm event listeners
     chatBubble.addEventListener('click', () => {
-        if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
-            chatWindow.style.display = 'flex';
-            loadChatHistory();
-            // Ẩn chat bubble khi mở chat window
-            chatBubble.style.display = 'none';
-        }
+        toggleChat(true);
     });
 
     document.getElementById('close-chat').addEventListener('click', (e) => {
-        e.stopPropagation(); // Ngăn event bubble lên parent
-        chatWindow.style.display = 'none';
-        // Hiện lại chat bubble khi đóng chat window
-        chatBubble.style.display = 'block';
+        e.preventDefault();
+        e.stopPropagation();
+        toggleChat(false);
     });
 
     // Thêm hover effect cho nút đóng
@@ -900,5 +895,23 @@ Chia sẻ với tớ nhé. Điều gì đang khiến cậu cảm thấy nặng l
         newViewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
         document.head.appendChild(newViewport);
     }
+
+    // Cập nhật event listeners cho đóng/mở chat
+    function toggleChat(show) {
+        if (show) {
+            chatWindow.style.display = 'flex';
+            chatBubble.style.display = 'none';
+            loadChatHistory();
+        } else {
+            chatWindow.style.display = 'none';
+            chatBubble.style.display = 'block';
+        }
+    }
+
+    // Đảm bảo chat window và bubble có trạng thái ban đầu đúng
+    document.addEventListener('DOMContentLoaded', () => {
+        chatWindow.style.display = 'none';
+        chatBubble.style.display = 'block';
+    });
 })();
   
